@@ -4,7 +4,7 @@ beautifulsoup4==4.12.3
 imageio==2.33.1
 imageio-ffmpeg==0.4.9
 importlib-metadata==7.0.1
-pyrogrampyrogram>=2.0.30 
+Pyrogram==2.0.106 
 requests==2.31.0
 requests-html==0.10.0
 requests-random-user-agent==2023.2.15
