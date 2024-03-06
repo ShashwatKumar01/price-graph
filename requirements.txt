@@ -8,6 +8,6 @@ pyrogrampyrogram>=2.0.30
 requests==2.31.0
 requests-html==0.10.0
 requests-random-user-agent==2023.2.15
-pillow 10.2.0
+pillow 
 bs4==0.0.2
 TgCrypto==1.2.5
