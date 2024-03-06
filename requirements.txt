@@ -1,7 +1,14 @@
-urllib
-
+urllib3==1.26.18
+w3lib==2.1.2
+beautifulsoup4==4.12.3
 PIL
+imageio==2.33.1
+imageio-ffmpeg==0.4.9
+importlib-metadata==7.0.1
 pyrogrampyrogram>=2.0.30 
-requests
-bs4
-tgcrypto
+requests==2.31.0
+requests-html==0.10.0
+requests-random-user-agent==2023.2.15
+pillow 10.2.0
+bs4==0.0.2
+TgCrypto==1.2.5
