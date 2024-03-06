@@ -1,12 +1,7 @@
- requests
- urllib
- urllib
- asyncio
- PIL
- time
- telebot
- pyrogram
- requests
- bs4
- requests
- tgcrypto
+urllib
+
+PIL
+pyrogrampyrogram>=2.0.30 
+requests
+bs4
+tgcrypto
