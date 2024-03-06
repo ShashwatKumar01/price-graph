@@ -1,0 +1,12 @@
+ requests
+ urllib
+ urllib
+ asyncio
+ PIL
+ time
+ telebot
+ pyrogram
+ requests
+ bs4
+ requests
+ tgcrypto
