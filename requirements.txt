@@ -11,3 +11,4 @@ requests-random-user-agent==2023.2.15
 pillow 
 bs4==0.0.2
 TgCrypto==1.2.5
+aiohttp==3.9.3
