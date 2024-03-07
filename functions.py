@@ -217,7 +217,7 @@ def resize_image(image, target_size):
     return image.resize((new_width, new_height), Image)
 
 
-def merge_images(image_urls):
+async def merge_images(image_urls):
     images = []
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
