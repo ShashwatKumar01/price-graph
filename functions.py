@@ -12,6 +12,7 @@ from urllib.parse import urlparse, parse_qs, urlunparse
 import requests
 import tgcrypto
 import re
+import aiohttp
 
 
 def extract_link_from_text(text):
@@ -84,87 +85,127 @@ def keepa_process(url):
     affiliate_url=create_amazon_affiliate_url(amazon_url,affiliate_tag='highfivesto0c-21' if country_code=='in'else 'highfivesto0c-20')
 
     return keepa_url,amazon_url,affiliate_url
+# def get_product_details(url):
+#     amazon_img_url = ''
+#     amazon_product_name = ''
+#     headers = {
+#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+#     }
+#     retries = 1
+#     for i in range(40):
+#         if 'amazon' not in url:
+#             break
+#         print(i)
+#         response =  requests.get(url, headers=headers)
+#         print(response)
+#         # print(response.text)
+#
+#         if response.status_code == 200:
+#             soup = BeautifulSoup(response.text, 'html.parser')
+#             product_title =  soup.find('span', {'id': 'productTitle'})
+#             product_image= soup.find('img', {'id': 'landingImage'})
+#             price_element = soup.find('span', {'class': 'a-offscreen'})
+#             unavailable_element = soup.find(lambda tag: tag.name == 'span' and
+#                                            tag.get('class') == ['a-size-medium a-color-success'] and
+#                                            tag.text.strip() == 'Currently unavailable.')
+#
+#             if product_image:
+#                 img_url=product_image.get('src')
+#                 if not amazon_img_url:
+#                     amazon_img_url=img_url
+#                     # response = requests.get(amazon_img_url)
+#                     # img = Image.open(BytesIO(response.content))
+#                     #
+#                     # img.show()
+#             if product_title:
+#                 amazon_product_name=product_title.text.strip()
+#                 if unavailable_element:
+#                     price_element ='Out Of Stock'
+#                 elif price_element:
+#                     price_element=price_element.text.strip()
+#                 else:
+#                     price_element='Unable to get Price'
+#                 # price_element=price_element.text.strip()
+#                 return amazon_product_name, amazon_img_url,price_element
+#                 break
+#                 if i==29:
+#                     return 'Product Name unable to Scrap',''
+#
+#             else:
+#                 None
+#
+#              # get_product_name(url)
+#         elif response.status_code == 503:
+#             print("503 Error: Server busy, retrying...")
+#             break
+#             return amazon_product_name, amazon_img_url, price_element
+#               # Wait for a while before retrying
+#
+#         elif response.status_code == 404:
+#             print("Error 404:", response.status_code)
+#             break
+#         else:
+#             None
+#
+#     return None
 async def get_product_details(url):
     amazon_img_url = ''
     amazon_product_name = ''
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
     }
-    retries = 1
-    for i in range(40):
-        if 'amazon' not in url:
-            break
 
-        response = requests.get(url, headers=headers)
-
-
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            product_title = soup.find('span', {'id': 'productTitle'})
-            product_image= soup.find('img', {'id': 'landingImage'})
-            price_element = soup.find('span', {'class': 'a-offscreen'})
-            unavailable_element = soup.find(lambda tag: tag.name == 'span' and
-                                           tag.get('class') == ['a-size-medium a-color-success'] and
-                                           tag.text.strip() == 'Currently unavailable.')
-
-            if product_image:
-                img_url=product_image.get('src')
-                if not amazon_img_url:
-                    amazon_img_url=img_url
-                    # response = requests.get(amazon_img_url)
-                    # img = Image.open(BytesIO(response.content))
-                    #
-                    # img.show()
-            if product_title:
-                amazon_product_name=product_title.text.strip()
-                if unavailable_element:
-                    price_element ='Out Of Stock'
-                elif price_element:
-                    price_element=price_element.text.strip()
-                elif unavailable_element:
-                    price_element ='Out Of Stock'
-                else:
-                    price_element='Unable to get Price'
-                # price_element=price_element.text.strip()
-                return amazon_product_name, amazon_img_url,price_element
+    async with aiohttp.ClientSession() as session:
+        retries = 1
+        for i in range(40):
+            print(i)
+            if 'amazon' not in url:
                 break
-                if i==29:
-                    return 'Product Name unable to Scrap',''
 
-            else:
-                None
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    html = await response.text()
+                    soup = BeautifulSoup(html, 'html.parser')
+                    product_title = soup.find('span', {'id': 'productTitle'})
+                    product_image = soup.find('img', {'id': 'landingImage'})
+                    price_element = soup.find('span', {'class': 'a-offscreen'})
+                    unavailable_element = soup.find(lambda tag: tag.name == 'span' and
+                                                     tag.get('class') == ['a-size-medium a-color-success'] and
+                                                     tag.text.strip() == 'Currently unavailable.')
 
-             # get_product_name(url)
-        elif response.status_code == 503:
-            print("503 Error: Server busy, retrying...")
-            time.sleep(2)  # Wait for a while before retrying
+                    if product_image:
+                        img_url = product_image.get('src')
+                        if not amazon_img_url:
+                            amazon_img_url = img_url
 
-        elif response.status_code == 404:
-            print("Error 404:", response.status_code)
-        else:
-            None
+                    if product_title:
+                        amazon_product_name = product_title.text.strip()
+
+                        if unavailable_element:
+                            price_element = 'Out Of Stock'
+                        elif price_element:
+                            price_element = price_element.text.strip()
+                        else:
+                            price_element = 'Unable to get Price'
+
+                        return amazon_product_name, amazon_img_url, price_element
+
+                elif response.status == 503:
+                    print("503 Error: Server busy, retrying...")
+                    break
+
+                elif response.status == 404:
+                    print("Error 404:", response.status)
+                    break
+
+            await asyncio.sleep(1)  # Wait before retrying
 
     return None
-
 
 import requests
 from PIL import Image
 from io import BytesIO
 
-
-def display_product_image(url):
-    # Send a GET request to the image URL
-    response = requests.get(url)
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        # Open the image data using PIL
-        img = Image.open(BytesIO(response.content))
-
-        # Display the image
-        img.show()
-    else:
-        print("Failed to retrieve the image. Status code:", response.status_code)
 
 def resize_image(image, target_size):
     # Resize the image while preserving aspect ratio
@@ -182,36 +223,41 @@ def merge_images(image_urls):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     }
     for url in image_urls:
-        response = requests.get(url,headers=headers)
-        img = Image.open(BytesIO(response.content))
-        if 'https://graph' in url:
-            width, height = img.size
-            new_width = width - 100  # Adjust the amount to be cropped from the right as needed
-            img = img.crop((0, 0, new_width, height))
+        img=None
+        if 'https:/' in url :
+            response = requests.get(url,headers=headers)
+            if response.status_code==200:
+                img = Image.open(BytesIO(response.content))
+                if 'https://graph' in url:
+                    width, height = img.size
+                    new_width = width - 80  # Adjust the amount to be cropped from the right as needed
+                    img = img.crop((0, 0, new_width, height))
+        if img:
+            images.append(img)
+    print('image count:', len(images))
+    if len(images)==2:
+        # Determine the size of the combined image
+        total_width = sum(img.width for img in images)
+        max_height = max(img.height for img in images)
 
-        images.append(img)
+        # Create a new blank image with the combined size
+        combined_image = Image.new('RGB', (total_width, max_height))
 
-    # Determine the size of the combined image
-    total_width = sum(img.width for img in images)
-    max_height = max(img.height for img in images)
+        # Paste each image into the combined image
+        x_offset = 0
+        for img in images:
+            combined_image.paste(img, (x_offset, 0))
+            x_offset += img.width
 
-    # Create a new blank image with the combined size
-    combined_image = Image.new('RGB', (total_width, max_height))
+        draw = ImageDraw.Draw(combined_image)
+        font = ImageFont.load_default()  # You can use a custom font if needed
 
-    # Paste each image into the combined image
-    x_offset = 0
-    for img in images:
-        combined_image.paste(img, (x_offset, 0))
-        x_offset += img.width
-
-    draw = ImageDraw.Draw(combined_image)
-    font = ImageFont.load_default()  # You can use a custom font if needed
-
-    text_position = (combined_image.width - 210, combined_image.height - 60)
-    draw.text(text_position, 'Web:  dealsanddiscounts.in\nTelegram:   deals_and_discounts_channel', fill="white", font=font)
-
+        text_position = (combined_image.width - 210, combined_image.height - 60)
+        draw.text(text_position, 'Web:  dealsanddiscounts.in\nTelegram:   deals_and_discounts_channel', fill="white", font=font)
+        return combined_image
     # Display or save the combined image
     # combined_image.show()
-    return combined_image
+    else:
+        return images[0].convert('RGB')
 
 
