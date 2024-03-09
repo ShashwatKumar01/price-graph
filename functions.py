@@ -87,8 +87,6 @@ def keepa_process(url):
     return keepa_url,amazon_url,affiliate_url
 
 async def get_product_details(url):
-    amazon_img_url = ''
-    amazon_product_name = ''
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
     }
@@ -98,7 +96,7 @@ async def get_product_details(url):
         for i in range(40):
             print(i)
             if 'amazon' not in url:
-                break
+                return None
 
             async with session.get(url, headers=headers) as response:
                 if response.status == 200:
@@ -113,8 +111,6 @@ async def get_product_details(url):
 
                     if product_image:
                         img_url = product_image.get('src')
-                        if not amazon_img_url:
-                            amazon_img_url = img_url
 
                     if product_title:
                         amazon_product_name = product_title.text.strip()
@@ -125,8 +121,8 @@ async def get_product_details(url):
                             price_element = price_element.text.strip()
                         else:
                             price_element = 'Unable to get Price'
-
-                        return amazon_product_name, amazon_img_url, price_element
+                        print(amazon_product_name,img_url,price_element)
+                        return amazon_product_name, img_url, price_element
 
                 elif response.status == 503:
                     if i==15:
@@ -141,20 +137,6 @@ async def get_product_details(url):
             await asyncio.sleep(1)  # Wait before retrying
 
     return None
-
-import requests
-from PIL import Image
-from io import BytesIO
-
-
-def resize_image(image, target_size):
-    # Resize the image while preserving aspect ratio
-    width_percent = target_size[0] / float(image.width)
-    height_percent = target_size[1] / float(image.height)
-    resize_percent = min(width_percent, height_percent)
-    new_width = int(image.width * resize_percent)
-    new_height = int(image.height * resize_percent)
-    return image.resize((new_width, new_height), Image)
 
 
 async def merge_images(image_urls):
@@ -194,10 +176,10 @@ async def merge_images(image_urls):
 
         text_position = (combined_image.width - 210, combined_image.height - 60)
         draw.text(text_position, 'Web:  dealsanddiscounts.in\nTelegram:   deals_and_discounts_channel', fill="white", font=font)
-        return combined_image
+        return  combined_image
     # Display or save the combined image
     # combined_image.show()
     else:
-        return images[0].convert('RGB')
+       return  images[0].convert('RGB')
 
 
