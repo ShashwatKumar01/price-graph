@@ -78,8 +78,8 @@ async def handle_text(client, message):
         user_info = f"User ID: {message.from_user.id}\nUsername: @{message.from_user.username}\nUser Input: {message.text}"
         error_message = f"Error: {str(e)}\n\nUser Info:\n{user_info}"
         contact_admin_button = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("Contact Admin", url="https://t.me/imovies_contact_bot",)]])
-        b = await app.send_message(admin_chat_id, error_message)
+            [[InlineKeyboardButton("Contact Admin", url="https://t.me/shashwatkumar01",)]])
+        b = await app.send_message(admin_chat_id, error_message, reply_markup=contact_admin_button)
         user_error_message = f"Oops! Something went Wrong.Input only Amazon Product URL.. Try Again.Reported to the admin."
         b= await app.send_message(message.chat.id, user_error_message,reply_markup=contact_admin_button)
         await asyncio.sleep(10)
