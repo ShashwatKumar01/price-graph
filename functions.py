@@ -85,69 +85,7 @@ def keepa_process(url):
     affiliate_url=create_amazon_affiliate_url(amazon_url,affiliate_tag='highfivesto0c-21' if country_code=='in'else 'highfivesto0c-20')
 
     return keepa_url,amazon_url,affiliate_url
-# def get_product_details(url):
-#     amazon_img_url = ''
-#     amazon_product_name = ''
-#     headers = {
-#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-#     }
-#     retries = 1
-#     for i in range(40):
-#         if 'amazon' not in url:
-#             break
-#         print(i)
-#         response =  requests.get(url, headers=headers)
-#         print(response)
-#         # print(response.text)
-#
-#         if response.status_code == 200:
-#             soup = BeautifulSoup(response.text, 'html.parser')
-#             product_title =  soup.find('span', {'id': 'productTitle'})
-#             product_image= soup.find('img', {'id': 'landingImage'})
-#             price_element = soup.find('span', {'class': 'a-offscreen'})
-#             unavailable_element = soup.find(lambda tag: tag.name == 'span' and
-#                                            tag.get('class') == ['a-size-medium a-color-success'] and
-#                                            tag.text.strip() == 'Currently unavailable.')
-#
-#             if product_image:
-#                 img_url=product_image.get('src')
-#                 if not amazon_img_url:
-#                     amazon_img_url=img_url
-#                     # response = requests.get(amazon_img_url)
-#                     # img = Image.open(BytesIO(response.content))
-#                     #
-#                     # img.show()
-#             if product_title:
-#                 amazon_product_name=product_title.text.strip()
-#                 if unavailable_element:
-#                     price_element ='Out Of Stock'
-#                 elif price_element:
-#                     price_element=price_element.text.strip()
-#                 else:
-#                     price_element='Unable to get Price'
-#                 # price_element=price_element.text.strip()
-#                 return amazon_product_name, amazon_img_url,price_element
-#                 break
-#                 if i==29:
-#                     return 'Product Name unable to Scrap',''
-#
-#             else:
-#                 None
-#
-#              # get_product_name(url)
-#         elif response.status_code == 503:
-#             print("503 Error: Server busy, retrying...")
-#             break
-#             return amazon_product_name, amazon_img_url, price_element
-#               # Wait for a while before retrying
-#
-#         elif response.status_code == 404:
-#             print("Error 404:", response.status_code)
-#             break
-#         else:
-#             None
-#
-#     return None
+
 async def get_product_details(url):
     amazon_img_url = ''
     amazon_product_name = ''
@@ -191,12 +129,14 @@ async def get_product_details(url):
                         return amazon_product_name, amazon_img_url, price_element
 
                 elif response.status == 503:
-                    print("503 Error: Server busy, retrying...")
-                    break
+                    if i==15:
+                        print("503 Error: Server busy, retrying...")
+                        break
 
                 elif response.status == 404:
-                    print("Error 404:", response.status)
-                    break
+                    if i==15:
+                        print("Error 404:", response.status)
+                        break
 
             await asyncio.sleep(1)  # Wait before retrying
 
