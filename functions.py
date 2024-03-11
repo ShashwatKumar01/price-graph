@@ -13,7 +13,7 @@ import requests
 import tgcrypto
 import re
 import aiohttp
-
+from unshortenit import UnshortenIt
 
 def extract_link_from_text(text):
     # Regular expression pattern to match a URL
@@ -25,10 +25,13 @@ def extract_link_from_text(text):
 
 def unshorten_url(short_url):
 
-    response = requests.head(short_url, allow_redirects=True,timeout=2)
+    # response = requests.head(short_url, allow_redirects=True,timeout=2)
 
-    return response.url
+    # return response.url
+    unshortener = UnshortenIt()
+    shorturi = unshortener.unshorten(short_url)
 
+    return shorturi
 
 def remove_amazon_affiliate_parameters(url):
     parsed_url = urlparse(url)
